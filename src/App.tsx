@@ -109,6 +109,7 @@ export default function App() {
               meetingNumber={currentScenarioIndex + 1}
               totalMeetings={scenarios.length}
               onDecision={handleDecision}
+              onHome={handleRestart}
             />
           </motion.div>
         ) }
@@ -124,6 +125,7 @@ export default function App() {
             <ReactionScreen 
               option={lastDecision} 
               onContinue={handleContinue} 
+              onHome={handleRestart}
             />
           </motion.div>
         )}

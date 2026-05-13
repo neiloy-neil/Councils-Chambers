@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
-import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Storage, GameResult } from '../utils/storage';
 import { Scenario, DecisionOption } from '../data/scenarios';
-import { ArrowLeft, Save, RotateCcw, Users, BookOpen, Trash2, Edit2, Check, X } from 'lucide-react';
+import { ArrowLeft, Save, RotateCcw, Users, BookOpen, Trash2, Edit2, Check, X, Plus, AlertCircle } from 'lucide-react';
 
 interface AdminPanelProps {
   onBack: () => void;
@@ -18,18 +18,62 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
   const [scenarios, setScenarios] = useState<Scenario[]>(Storage.getScenarios());
   const [activeTab, setActiveTab] = useState<'results' | 'scenarios'>('results');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
+  const showFeedback = (message: string, type: 'success' | 'info' = 'success') => {
+    setFeedback({ message, type });
+  };
+
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
 
   const handleResetScenarios = () => {
     if (confirm("Reset all scenarios to defaults? This cannot be undone.")) {
       const reset = Storage.resetScenarios();
       setScenarios(reset);
+      showFeedback("Scenarios reset to defaults", "info");
     }
   };
 
   const handleSaveScenarios = () => {
     Storage.saveScenarios(scenarios);
-    alert("Scenarios saved to local storage!");
-    // FUTURE: PUT /api/scenarios
+    showFeedback("All changes committed to local storage");
+  };
+
+  const handleAddScenario = () => {
+    const newScenario: Scenario = {
+      id: `custom-${Date.now()}`,
+      title: "New Legislative Challenge",
+      description: "Describe the situation here...",
+      options: [
+        {
+          id: 'opt1',
+          text: 'The progressive path',
+          reaction: 'The public reacts to your change...',
+          effects: { trust: 5, budget: -5, ethics: 10, impact: 5, support: 5 }
+        },
+        {
+          id: 'opt2',
+          text: 'The pragmatic path',
+          reaction: 'The stakeholders accept the reality...',
+          effects: { trust: -5, budget: 10, ethics: -5, impact: 0, support: 10 }
+        }
+      ]
+    };
+    setScenarios(prev => [...prev, newScenario]);
+    setEditingId(newScenario.id);
+    showFeedback("New scenario added");
+  };
+
+  const handleDeleteScenario = (id: string) => {
+    if (confirm("Delete this scenario permanently?")) {
+      setScenarios(prev => prev.filter(s => s.id !== id));
+      showFeedback("Scenario removed", "info");
+    }
   };
 
   const handleClearResults = () => {
@@ -85,6 +129,22 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
           </div>
 
           <div className="flex gap-2">
+            <AnimatePresence>
+              {feedback && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-sm ${
+                    feedback.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-blue-50 text-blue-600 border border-blue-100'
+                  }`}
+                >
+                  {feedback.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  {feedback.message}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {activeTab === 'scenarios' && (
               <>
                 <button onClick={handleResetScenarios} className="p-2 text-slate-400 hover:text-orange-600 transition-colors" title="Reset to Defaults">
@@ -157,6 +217,17 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
           </div>
         ) : (
           <div className="space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-slate-800">Archive Scenarios</h2>
+              <button 
+                onClick={handleAddScenario}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                New Scenario
+              </button>
+            </div>
+
             {scenarios.map(s => (
               <motion.div 
                 layout
@@ -175,12 +246,23 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                       <h3 className="text-xl font-black text-slate-900">{s.title}</h3>
                     )}
                   </div>
-                  <button 
-                    onClick={() => setEditingId(editingId === s.id ? null : s.id)}
-                    className="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
-                  >
-                    {editingId === s.id ? <Check className="w-5 h-5 text-green-600" /> : <Edit2 className="w-5 h-5" />}
-                  </button>
+                  <div className="flex gap-2">
+                    {editingId === s.id && (
+                      <button 
+                        onClick={() => handleDeleteScenario(s.id)}
+                        className="p-2 bg-red-50 rounded-xl text-red-400 hover:text-red-600 transition-all"
+                        title="Delete Scenario"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => setEditingId(editingId === s.id ? null : s.id)}
+                      className="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                    >
+                      {editingId === s.id ? <Check className="w-5 h-5 text-green-600" /> : <Edit2 className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mb-6">
