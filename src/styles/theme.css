@@ -1,0 +1,498 @@
+.app-background {
+  background-color: #1a202c; /* deep navy/charcoal */
+}
+
+.start-screen-background {
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.1), #1a202c);
+}
+
+.start-screen-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffd70030;
+}
+
+.shield-icon-background {
+  background-color: #ffd700;
+}
+
+.shield-icon-color {
+  color: #1a202c;
+}
+
+.admin-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #ffd70030;
+}
+
+.admin-button-icon {
+  color: #ffd700;
+}
+
+.title-color {
+  color: #ffd700;
+}
+
+.subtitle-color {
+  color: #ffd70090;
+}
+
+.label-color {
+  color: #00ffff;
+}
+
+.input-field {
+  background-color: #1a202c80;
+  border-color: #00ffff50;
+  color: #ffd700;
+}
+
+.avatar-button-male {
+  border-color: #ffd700;
+  background-color: #ffd70020;
+}
+
+.avatar-button-female {
+  border-color: #ffd700;
+  background-color: #ffd70020;
+}
+
+.avatar-button-inactive {
+  border-color: #00ffff50;
+  background-color: transparent;
+}
+
+.avatar-icon-male-active {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.avatar-icon-female-active {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.avatar-icon-inactive {
+  background-color: #00ffff20;
+  color: #00ffff;
+}
+
+.avatar-text-male-active {
+  color: #ffd700;
+}
+
+.avatar-text-female-active {
+  color: #ffd700;
+}
+
+.avatar-text-inactive {
+  color: #00ffff;
+}
+
+.submit-button {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.game-screen-background {
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.1), #1a202c);
+}
+
+.return-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #ffd70030;
+  color: #ffd700;
+}
+
+.game-header {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffd70030;
+}
+
+.landmark-icon-background {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.session-label {
+  color: #00ffff;
+}
+
+.meeting-title {
+  color: #ffd700;
+}
+
+.meeting-subtitle {
+  color: #ffd70090;
+}
+
+.progression-bar-container {
+  background-color: #1a202c80;
+}
+
+.progress-bar-active {
+  background-color: #ffd700;
+}
+
+.progress-bar-inactive {
+  background-color: #00ffff20;
+}
+
+.game-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffd70030;
+}
+
+.game-card-header {
+  background-color: #1a202c;
+  border-bottom: 2px solid #ffd700;
+}
+
+.priority-agenda-label {
+  background-color: #ffd70020;
+  color: #ffd700;
+  border: 1px solid #ffd70030;
+}
+
+.scenario-title {
+  color: white;
+}
+
+.scenario-description-container {
+  border-color: #00ffff;
+  background-color: #1a202c80;
+}
+
+.scenario-description {
+  color: white;
+}
+
+.decision-button {
+  border-color: #00ffff50;
+  background-color: transparent;
+}
+
+.decision-button-icon-container {
+  background-color: #00ffff20;
+  color: #00ffff;
+}
+
+.decision-button-text {
+  color: white;
+}
+
+.decision-button-arrow {
+  color: #ffd700;
+}
+
+.reaction-screen-background-positive {
+  background: radial-gradient(ellipse at top, #38a16920, #1a202c);
+}
+
+.reaction-screen-background-negative {
+  background: radial-gradient(ellipse at top, #e53e3e20, #1a202c);
+}
+
+.reaction-screen-card-positive {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #38a16950;
+}
+
+.reaction-screen-card-negative {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e53e3e50;
+}
+
+.reaction-icon-background-positive {
+  background-color: #38a169;
+  color: white;
+}
+
+.reaction-icon-background-negative {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.reaction-label-positive {
+  border-color: #38a16950;
+  color: #38a169;
+  background-color: #38a16920;
+}
+
+.reaction-label-negative {
+  border-color: #e53e3e50;
+  color: #e53e3e;
+  background-color: #e53e3e20;
+}
+
+.reaction-title-color {
+  color: white;
+}
+
+.reaction-button-positive {
+  background-color: #38a169;
+  color: white;
+}
+
+.reaction-button-negative {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.result-screen-background {
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.1), #1a202c);
+}
+
+.result-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffd70030;
+}
+
+.result-header {
+  background-color: #1a202c;
+  border-bottom: 2px solid #ffd700;
+}
+
+.trophy-icon-color {
+  color: #ffd700;
+}
+
+.avatar-icon-container {
+  background-color: #ffd70020;
+  border: 1px solid #ffd70030;
+}
+
+.avatar-icon-color {
+  color: #ffd700;
+}
+
+.legislative-record-label {
+  color: #00ffff;
+}
+
+.result-title-color {
+  color: white;
+}
+
+.result-description-color {
+  color: #ffd70090;
+}
+
+.tenure-rating-label {
+  color: #00ffff;
+}
+
+.tenure-rating-value {
+  color: #ffd700;
+}
+
+.political-capital-label {
+  color: #00ffff;
+}
+
+.political-capital-value {
+  color: #ffd700;
+}
+
+.history-quote-container {
+  background-color: #1a202c80;
+  border: 1px solid #00ffff50;
+}
+
+.history-quote-text {
+  color: white;
+}
+
+.stats-item {
+  background-color: #1a202c80;
+  border: 1px solid #00ffff50;
+}
+
+.stats-label {
+  color: #00ffff;
+}
+
+.relinquish-power-button {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.return-to-headquarters-button {
+  color: #00ffff;
+}
+
+.archive-text {
+  color: #00ffff;
+}
+
+.admin-panel-background {
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.1), #1a202c);
+}
+
+.admin-header {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffd70030;
+}
+
+.exit-admin-button {
+  color: #ffd700;
+}
+
+.tabs-container {
+  background-color: #1a202c80;
+}
+
+.tab-active {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.tab-inactive {
+  background-color: transparent;
+  color: #ffd700;
+}
+
+.feedback-success {
+  background-color: #38a16920;
+  color: #38a169;
+  border: 1px solid #38a16950;
+}
+
+.feedback-info {
+  background-color: #00ffff20;
+  color: #00ffff;
+  border: 1px solid #00ffff50;
+}
+
+.reset-button {
+  color: #dd6b20;
+}
+
+.save-button {
+  color: #38a169;
+}
+
+.clear-history-button {
+  color: #e53e3e;
+}
+
+.results-table-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #ffd70030;
+}
+
+.results-table-header {
+  border-bottom: 1px solid #ffd70030;
+  color: #00ffff;
+}
+
+.results-table-body {
+  border-color: #ffd70020;
+}
+
+.results-table-row {
+  color: white;
+}
+
+.player-avatar-container {
+  background-color: #ffd70020;
+  color: #ffd700;
+}
+
+.player-title-label {
+  background-color: #00ffff20;
+  color: #00ffff;
+}
+
+.archive-scenarios-title {
+  color: white;
+}
+
+.new-scenario-button {
+  background-color: #ffd700;
+  color: #1a202c;
+}
+
+.scenario-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #ffd70030;
+}
+
+.scenario-title-input {
+  background-color: transparent;
+  border-color: #ffd700;
+  color: white;
+}
+
+.delete-scenario-button {
+  background-color: #e53e3e20;
+  color: #e53e3e;
+}
+
+.edit-scenario-button {
+  background-color: #00ffff20;
+  color: #00ffff;
+}
+
+.save-scenario-button {
+  background-color: #38a16920;
+  color: #38a169;
+}
+
+.scenario-description-input {
+  background-color: #1a202c80;
+  color: white;
+  border: 1px solid #00ffff50;
+}
+
+.scenario-description-text {
+  color: white;
+}
+
+.options-reactions-label {
+  color: #00ffff;
+}
+
+.option-reaction-container {
+  background-color: #1a202c80;
+  border: 1px solid #00ffff50;
+}
+
+.option-label {
+  background-color: #00ffff20;
+  color: #00ffff;
+}
+
+.option-text-input {
+  border-color: #00ffff50;
+  color: white;
+}
+
+.option-text {
+  color: white;
+}
+
+.reaction-label {
+  background-color: #ffd70020;
+  color: #ffd700;
+}
+
+.reaction-text-input {
+  border-color: #ffd70050;
+  color: white;
+}
+
+.reaction-text {
+  color: white;
+}
+
+.commit-changes-button {
+  background-color: #ffd700;
+  color: #1a202c;
+}
