@@ -6,6 +6,7 @@
 import { motion } from 'motion/react';
 import { Scenario, DecisionOption } from '../data/scenarios';
 import { Building2, Landmark, HelpCircle } from 'lucide-react';
+import { audioManager } from '../utils/audio';
 
 interface GameScreenProps {
   scenario: Scenario;
@@ -15,6 +16,11 @@ interface GameScreenProps {
 }
 
 export default function GameScreen({ scenario, meetingNumber, totalMeetings, onDecision }: GameScreenProps) {
+  const handleDecision = (option: DecisionOption) => {
+    audioManager.play('gavel');
+    onDecision(option);
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 bg-parchment text-slate-900 font-sans">
       <div className="max-w-4xl w-full py-12">
@@ -116,7 +122,7 @@ export default function GameScreen({ scenario, meetingNumber, totalMeetings, onD
                     transition={{ delay: 0.6 + (index * 0.1) }}
                     whileHover={{ scale: 1.02, y: -5, borderColor: "#c5a059", backgroundColor: "#fdfaf3" }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => onDecision(option)}
+                    onClick={() => handleDecision(option)}
                     className="group relative flex flex-col items-start gap-4 p-8 rounded-3xl border-2 border-slate-50 bg-slate-50/50 hover:shadow-2xl hover:shadow-gold/10 transition-all text-left"
                   >
                     <div className="bg-white group-hover:bg-parliament group-hover:text-gold p-4 rounded-2xl shadow-sm transition-all mb-2">

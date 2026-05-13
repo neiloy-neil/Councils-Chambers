@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Scores, getResultTitle, getResultDescription, calculateTotalScore } from '../utils/scoring';
 import { User, UserCircle, RotateCcw, Trophy, TrendingUp, DollarSign, Heart, ShieldCheck, Footprints } from 'lucide-react';
+import { audioManager } from '../utils/audio';
 
 interface ResultScreenProps {
   playerName: string;
@@ -15,9 +17,19 @@ interface ResultScreenProps {
 }
 
 export default function ResultScreen({ playerName, avatar, scores, onRestart }: ResultScreenProps) {
+  useEffect(() => {
+    // Play thematic success sound on conclusion
+    audioManager.play('success');
+  }, []);
+
   const totalScore = calculateTotalScore(scores);
   const title = getResultTitle(totalScore);
   const description = getResultDescription(totalScore);
+
+  const handleRestart = () => {
+    audioManager.play('click');
+    onRestart();
+  };
 
   const stats = [
     { label: 'Community Trust', value: scores.trust, icon: Heart, color: 'text-red-500', bg: 'bg-red-50' },
@@ -122,7 +134,7 @@ export default function ResultScreen({ playerName, avatar, scores, onRestart }: 
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              onClick={onRestart}
+              onClick={handleRestart}
               className="w-full bg-parliament text-white py-6 rounded-[2rem] font-black flex items-center justify-center gap-4 hover:shadow-2xl hover:shadow-parliament/20 transition-all uppercase tracking-[0.4em] text-xs"
             >
               <RotateCcw className="w-5 h-5 text-gold" />

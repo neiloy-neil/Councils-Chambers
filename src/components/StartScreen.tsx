@@ -6,6 +6,7 @@
 import { useState, FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { User, UserCircle, Shield, Settings } from 'lucide-react';
+import { audioManager } from '../utils/audio';
 
 interface StartScreenProps {
   onStart: (name: string, avatar: 'male' | 'female') => void;
@@ -19,8 +20,14 @@ export default function StartScreen({ onStart, onAdmin }: StartScreenProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
+      audioManager.play('paper');
       onStart(name.trim(), avatar);
     }
+  };
+
+  const selectAvatar = (av: 'male' | 'female') => {
+    setAvatar(av);
+    audioManager.play('click');
   };
 
   return (
@@ -99,7 +106,7 @@ export default function StartScreen({ onStart, onAdmin }: StartScreenProps) {
               <motion.button
                 type="button"
                 whileHover={{ y: -5 }}
-                onClick={() => setAvatar('male')}
+                onClick={() => selectAvatar('male')}
                 className={`flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 transition-all relative overflow-hidden group ${
                   avatar === 'male' ? 'border-parliament bg-parliament shadow-2xl shadow-parliament/20' : 'border-slate-100 bg-white hover:border-slate-200'
                 }`}
@@ -118,7 +125,7 @@ export default function StartScreen({ onStart, onAdmin }: StartScreenProps) {
               <motion.button
                 type="button"
                 whileHover={{ y: -5 }}
-                onClick={() => setAvatar('female')}
+                onClick={() => selectAvatar('female')}
                 className={`flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 transition-all relative overflow-hidden group ${
                   avatar === 'female' ? 'border-parliament bg-parliament shadow-2xl shadow-parliament/20' : 'border-slate-100 bg-white hover:border-slate-200'
                 }`}

@@ -6,6 +6,7 @@
 import { motion } from 'motion/react';
 import { DecisionOption } from '../data/scenarios';
 import { MessageSquare, ArrowRight, Landmark } from 'lucide-react';
+import { audioManager } from '../utils/audio';
 
 interface ReactionScreenProps {
   option: DecisionOption;
@@ -14,6 +15,11 @@ interface ReactionScreenProps {
 
 export default function ReactionScreen({ option, onContinue }: ReactionScreenProps) {
   const words = option.reaction.split(' ');
+
+  const handleContinue = () => {
+    audioManager.play('click');
+    onContinue();
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-parliament text-white font-sans relative overflow-hidden">
@@ -106,7 +112,7 @@ export default function ReactionScreen({ option, onContinue }: ReactionScreenPro
             transition={{ delay: 2 }}
             whileHover={{ scale: 1.05, gap: "2rem" }}
             whileTap={{ scale: 0.95 }}
-            onClick={onContinue}
+            onClick={handleContinue}
             className="group flex items-center gap-6 bg-parliament text-white px-16 py-6 rounded-[2rem] font-bold text-xl hover:bg-slate-800 transition-all shadow-[0_20px_40px_-10px_rgba(26,42,68,0.3)] uppercase tracking-[0.2em] text-[12px]"
           >
             Adjourn Session
