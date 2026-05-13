@@ -1,0 +1,52 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { ScoreEffect } from '../data/scenarios';
+
+export interface Scores {
+  trust: number;
+  budget: number;
+  ethics: number;
+  impact: number;
+  support: number;
+}
+
+export const INITIAL_SCORES: Scores = {
+  trust: 50,
+  budget: 50,
+  ethics: 50,
+  impact: 50,
+  support: 50,
+};
+
+export function calculateNewScores(current: Scores, effect: ScoreEffect): Scores {
+  return {
+    trust: Math.max(0, Math.min(100, current.trust + effect.trust)),
+    budget: Math.max(0, Math.min(100, current.budget + effect.budget)),
+    ethics: Math.max(0, Math.min(100, current.ethics + effect.ethics)),
+    impact: Math.max(0, Math.min(100, current.impact + effect.impact)),
+    support: Math.max(0, Math.min(100, current.support + effect.support)),
+  };
+}
+
+export function calculateTotalScore(scores: Scores): number {
+  return Math.round((scores.trust + scores.budget + scores.ethics + scores.impact + scores.support) / 5);
+}
+
+export function getResultTitle(total: number): string {
+  if (total >= 80) return "Master Statesperson";
+  if (total >= 60) return "Capable Councillor";
+  if (total >= 40) return "Average Administrator";
+  if (total >= 20) return "Struggling Servant";
+  return "Political Pariah";
+}
+
+export function getResultDescription(total: number): string {
+  if (total >= 80) return "Your tenure has been legendary. You've balanced the books, maintained high ethics, and left a lasting positive impact on the community. You are beloved by all.";
+  if (total >= 60) return "A solid performance. While not perfect, you've made more good decisions than bad and generally moved the city forward.";
+  if (total >= 40) return "You survived your term. Some people are happy, some are not. You played it safe, perhaps too safe at times.";
+  if (total >= 20) return "Your term was marked by controversy and difficult trade-offs that didn't always go your way. The city faces a rocky road ahead.";
+  return "A disastrous term. Ethical lapses, budget failures, or a complete loss of trust has left your legacy in tatters.";
+}
