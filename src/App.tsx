@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import ReactionScreen from './components/ReactionScreen';
@@ -76,42 +77,85 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
-      {view === 'START' && (
-        <StartScreen 
-          onStart={handleStartGame} 
-          onAdmin={() => setView('ADMIN')} 
-        />
-      )}
+    <div className="min-h-screen bg-parchment relative overflow-hidden">
+      <div className="grain" />
+      
+      <AnimatePresence mode="wait">
+        {view === 'START' && (
+          <motion.div
+            key="start"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <StartScreen 
+              onStart={handleStartGame} 
+              onAdmin={() => setView('ADMIN')} 
+            />
+          </motion.div>
+        )}
 
-      {view === 'GAME' && scenarios.length > 0 && (
-        <GameScreen
-          scenario={scenarios[currentScenarioIndex]}
-          meetingNumber={currentScenarioIndex + 1}
-          totalMeetings={scenarios.length}
-          onDecision={handleDecision}
-        />
-      ) }
+        {view === 'GAME' && scenarios.length > 0 && (
+          <motion.div
+            key={`game-${currentScenarioIndex}`}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <GameScreen
+              scenario={scenarios[currentScenarioIndex]}
+              meetingNumber={currentScenarioIndex + 1}
+              totalMeetings={scenarios.length}
+              onDecision={handleDecision}
+            />
+          </motion.div>
+        ) }
 
-      {view === 'REACTION' && lastDecision && (
-        <ReactionScreen 
-          option={lastDecision} 
-          onContinue={handleContinue} 
-        />
-      )}
+        {view === 'REACTION' && lastDecision && (
+          <motion.div
+            key="reaction"
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.6 }}
+          >
+            <ReactionScreen 
+              option={lastDecision} 
+              onContinue={handleContinue} 
+            />
+          </motion.div>
+        )}
 
-      {view === 'RESULT' && (
-        <ResultScreen
-          playerName={playerName}
-          avatar={avatar}
-          scores={scores}
-          onRestart={handleRestart}
-        />
-      )}
+        {view === 'RESULT' && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <ResultScreen
+              playerName={playerName}
+              avatar={avatar}
+              scores={scores}
+              onRestart={handleRestart}
+            />
+          </motion.div>
+        )}
 
-      {view === 'ADMIN' && (
-        <AdminPanel onBack={() => setView('START')} />
-      )}
+        {view === 'ADMIN' && (
+          <motion.div
+            key="admin"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <AdminPanel onBack={() => setView('START')} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

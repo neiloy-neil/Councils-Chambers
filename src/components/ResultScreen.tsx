@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { motion, animate } from 'motion/react';
 import { Scores, getResultTitle, getResultDescription, calculateTotalScore } from '../utils/scoring';
 import { User, UserCircle, RotateCcw, Trophy, TrendingUp, DollarSign, Heart, ShieldCheck, Footprints } from 'lucide-react';
 import { audioManager } from '../utils/audio';
@@ -16,9 +16,25 @@ interface ResultScreenProps {
   onRestart: () => void;
 }
 
+function Counter({ value }: { value: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(0, value, {
+      duration: 2,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate(value) {
+        setDisplayValue(Math.floor(value));
+      },
+    });
+    return () => controls.stop();
+  }, [value]);
+
+  return <span>{displayValue}</span>;
+}
+
 export default function ResultScreen({ playerName, avatar, scores, onRestart }: ResultScreenProps) {
   useEffect(() => {
-    // Play thematic success sound on conclusion
     audioManager.play('success');
   }, []);
 
@@ -34,96 +50,118 @@ export default function ResultScreen({ playerName, avatar, scores, onRestart }: 
   const stats = [
     { label: 'Community Trust', value: scores.trust, icon: Heart, color: 'text-red-500', bg: 'bg-red-50' },
     { label: 'Budget Health', value: scores.budget, icon: DollarSign, color: 'text-green-500', bg: 'bg-green-50' },
-    { label: 'Ethics', value: scores.ethics, icon: ShieldCheck, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Long-Term Impact', value: scores.impact, icon: Footprints, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Political Support', value: scores.support, icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: 'Ethical Stand', value: scores.ethics, icon: ShieldCheck, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Long-Term Impact', value: scores.impact, icon: Footprints, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { label: 'Political Support', value: scores.support, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-50' },
   ];
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 bg-parchment text-slate-900 font-sans lg:py-20">
-      <div className="max-w-4xl w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-white rounded-[3.5rem] shadow-[0_64px_128px_-16px_rgba(26,42,68,0.15)] border border-slate-100 overflow-hidden"
-        >
-          <div className="bg-parliament px-12 py-20 text-white text-center relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              <Trophy className="w-96 h-96 absolute -bottom-24 -right-24 transform rotate-12 text-gold" />
-            </div>
-            
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-gold via-white/20 to-gold" />
+    <div className="flex flex-col items-center min-h-screen p-4 bg-parchment text-slate-900 font-sans lg:py-24 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-gold rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-parliament rounded-full blur-[100px]" />
+      </div>
 
+      <div className="max-w-5xl w-full relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-white rounded-[4rem] shadow-[0_80px_160px_-16px_rgba(26,42,68,0.25)] border border-slate-100 overflow-hidden"
+        >
+          <div className="bg-parliament px-16 py-24 text-white text-center relative overflow-hidden">
             <motion.div 
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3, type: "spring" }}
-              className="relative z-10"
+               initial={{ scale: 0, rotate: -45 }}
+               animate={{ scale: 1, rotate: 12 }}
+               transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
+               className="absolute -bottom-12 -right-12 opacity-20 pointer-events-none"
             >
-              <div className="inline-flex items-center justify-center bg-white/5 p-6 rounded-[2.5rem] mb-8 backdrop-blur-md border border-white/10 ring-8 ring-white/5 group transition-all hover:ring-gold/20">
-                {avatar === 'male' ? <User className="w-16 h-16 text-gold" /> : <UserCircle className="w-16 h-16 text-gold" />}
-              </div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+              <Trophy className="w-96 h-96 text-gold" />
+            </motion.div>
+            
+            <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-gold via-white/30 to-gold" />
+
+            <div className="relative z-10">
+              <motion.div 
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, type: "spring", bounce: 0.5 }}
+                className="inline-flex items-center justify-center bg-white/5 p-8 rounded-[3rem] mb-10 backdrop-blur-xl border border-white/10 ring-12 ring-white/5"
               >
-                <p className="text-gold font-black uppercase tracking-[0.4em] text-[12px] mb-4">Official Term Summary for {playerName}</p>
-                <h1 className="text-6xl font-serif font-black mb-6 leading-tight">{title}</h1>
-                <p className="text-slate-300 text-lg max-w-xl mx-auto leading-relaxed italic opacity-80">
+                {avatar === 'male' ? <User className="w-20 h-20 text-gold" /> : <UserCircle className="w-20 h-20 text-gold" />}
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <p className="text-gold font-black uppercase tracking-[0.5em] text-[13px] mb-6">Legislative Archival Record • {playerName}</p>
+                <h1 className="text-7xl font-serif font-black mb-8 leading-[0.9] tracking-tight">{title}</h1>
+                <p className="text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed italic opacity-85">
                   "{description}"
                 </p>
               </motion.div>
-            </motion.div>
+            </div>
           </div>
 
-          <div className="p-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-16 pb-16 border-b border-slate-100">
+          <div className="p-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-20 pb-20 border-b border-slate-100">
                <div>
-                 <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-black mb-2">Aggregate Civic Performance</p>
-                 <div className="flex items-baseline gap-2">
-                   <motion.span 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
-                    className="text-8xl font-serif font-black text-parliament"
-                   >
-                     {totalScore}
-                   </motion.span>
-                   <span className="text-2xl font-bold text-gold">/ 100</span>
+                 <p className="text-[12px] uppercase tracking-[0.4em] text-slate-400 font-black mb-4">Tenure Impact Rating</p>
+                 <div className="flex items-baseline gap-4">
+                   <span className="text-9xl font-serif font-black text-parliament">
+                     <Counter value={totalScore} />
+                   </span>
+                   <span className="text-4xl font-bold text-gold opacity-50">/ 100</span>
                  </div>
                </div>
-               <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
-                  <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                    "This score reflects the complex balance of economic stability, public trust, and ethical governance achieved during your landmark tenure."
+               <motion.div 
+                 initial={{ opacity: 0, x: 20 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 transition={{ delay: 1 }}
+                 className="bg-slate-50 p-12 rounded-[3rem] border border-slate-100 relative group overflow-hidden"
+               >
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <ShieldCheck className="w-24 h-24" />
+                  </div>
+                  <p className="text-lg text-slate-500 leading-relaxed font-serif italic relative z-10">
+                    "History will judge your decisions by the balance you maintained between the scales of progress and the weights of tradition."
                   </p>
-               </div>
+               </motion.div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
               {stats.map((stat, i) => (
                 <motion.div 
                   key={stat.label} 
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1 + (i * 0.1) }}
-                  className="flex flex-col gap-4 p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-2 group"
+                  transition={{ delay: 1.2 + (i * 0.1) }}
+                  whileHover={{ 
+                    y: -12, 
+                    boxShadow: "0 40px 80px -20px rgba(0,0,0,0.1)",
+                    borderColor: i % 2 === 0 ? "#121d2f" : "#d4af37"
+                  }}
+                  className="flex flex-col gap-6 p-10 rounded-[3rem] bg-white border-2 border-slate-50 shadow-sm transition-all group"
                 >
-                  <div className={`${stat.bg} ${stat.color} w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-current/5 group-hover:scale-110 transition-transform`}>
-                    <stat.icon className="w-7 h-7" />
+                  <div className={`${stat.bg} ${stat.color} w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-current/10 group-hover:scale-110 transition-transform`}>
+                    <stat.icon className="w-8 h-8" />
                   </div>
                   <div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</span>
-                      <span className={`text-lg font-black ${stat.color}`}>{stat.value}</span>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</span>
+                      <span className={`text-2xl font-black ${stat.color}`}>
+                        <Counter value={stat.value} />%
+                      </span>
                     </div>
-                    <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                    <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-1 border border-slate-200">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${stat.value}%` }}
-                        transition={{ delay: 1.5 + (i * 0.1), duration: 1.5, ease: "easeOut" }}
-                        className={`h-full rounded-full bg-current ${stat.color}`}
+                        transition={{ delay: 1.8 + (i * 0.1), duration: 2, ease: "circOut" }}
+                        className={`h-full rounded-full bg-current ${stat.color} shadow-[0_0_15px_rgba(0,0,0,0.1)]`}
                       />
                     </div>
                   </div>
@@ -132,20 +170,28 @@ export default function ResultScreen({ playerName, avatar, scores, onRestart }: 
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.02, y: -2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.2 }}
+              whileHover={{ scale: 1.02, y: -4, gap: "2.5rem" }}
               whileTap={{ scale: 0.98 }}
               onClick={handleRestart}
-              className="w-full bg-parliament text-white py-6 rounded-[2rem] font-black flex items-center justify-center gap-4 hover:shadow-2xl hover:shadow-parliament/20 transition-all uppercase tracking-[0.4em] text-xs"
+              className="group w-full bg-parliament text-white py-8 rounded-[3rem] font-black flex items-center justify-center gap-6 hover:shadow-[0_32px_64px_-16px_rgba(212,175,55,0.4)] transition-all uppercase tracking-[0.6em] text-[13px] border-t-4 border-gold"
             >
-              <RotateCcw className="w-5 h-5 text-gold" />
-              Retire from Public Service
+              <RotateCcw className="w-6 h-6 text-gold group-hover:rotate-180 transition-transform duration-700" />
+              Relinquish Power
             </motion.button>
           </div>
         </motion.div>
 
-        <p className="mt-12 text-center text-slate-400 text-[10px] font-black uppercase tracking-[1em] opacity-40">
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ delay: 2.5 }}
+          className="mt-16 text-center text-slate-400 text-[11px] font-black uppercase tracking-[1.5em]"
+        >
           ARCHIVED AT CITY HALL • PERMANENT RECORD
-        </p>
+        </motion.p>
       </div>
     </div>
   );
