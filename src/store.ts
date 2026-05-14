@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { Scenario, DecisionOption } from './data/scenarios';
-import { Scores, INITIAL_SCORES, calculateNewScores, calculateTotalScore } from './utils/scoring';
+import {
+  Scores,
+  INITIAL_SCORES,
+  calculateNewScores,
+  calculateTotalScore,
+  calculateStarReward,
+  getResultTitle,
+  getUnlockedBadges,
+} from './utils/scoring';
 import { Storage, GameResult } from './utils/storage';
 
 type View = 'START' | 'GAME' | 'REACTION' | 'RESULT' | 'ADMIN';
@@ -13,29 +21,17 @@ interface GameState {
   currentScenarioIndex: number;
   scores: Scores;
   lastDecision: DecisionOption | null;
-  results: GameResult[]; // Added for admin panel to manage results
-  politicalCapital: number; // New state
+  results: GameResult[];
+  stars: number;
+  lastStarReward: number;
 
-  // Actions
   setView: (view: View) => void;
-  setPlayerName: (name: string) => void;
-  setAvatar: (avatar: 'male' | 'female') => void;
   loadScenarios: () => void;
+  loadResults: () => void;
   startGame: (name: string, avatar: 'male' | 'female') => void;
   makeDecision: (option: DecisionOption) => void;
   continueGame: () => void;
   restartGame: () => void;
-  spendPoliticalCapital: (amount: number) => void; // New action
-  
-  // Admin Actions
-  loadResults: () => void;
-  resetScenarios: () => void;
-  saveScenariosToStorage: (scenarios: Scenario[]) => void;
-  addScenario: (scenario: Scenario) => void;
-  deleteScenario: (id: string) => void;
-  clearResults: () => void;
-  updateScenarioField: (id: string, field: keyof Scenario, value: any) => void;
-  updateOptionField: (scenarioId: string, optionId: string, field: keyof DecisionOption, value: any) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -47,119 +43,84 @@ export const useGameStore = create<GameState>((set, get) => ({
   scores: INITIAL_SCORES,
   lastDecision: null,
   results: [],
-  politicalCapital: 10, // Initial political capital
+  stars: 0,
+  lastStarReward: 0,
 
   setView: (view) => set({ view }),
-  setPlayerName: (playerName) => set({ playerName }),
-  setAvatar: (avatar) => set({ avatar }),
 
   loadScenarios: () => {
     set({ scenarios: Storage.getScenarios() });
-  },
-
-  startGame: (name, avatar) => {
-    set({
-      playerName: name,
-      avatar: avatar,
-      scores: INITIAL_SCORES,
-      currentScenarioIndex: 0,
-      view: 'GAME',
-      politicalCapital: 10,
-    });
-  },
-
-  makeDecision: (option) => {
-    set((state) => ({
-      lastDecision: option,
-      scores: calculateNewScores(state.scores, option.effects),
-      politicalCapital: state.politicalCapital + (option.effects.politicalCapital || 0),
-      view: 'REACTION',
-    }));
-  },
-
-  continueGame: () => {
-    const state = get();
-    if (state.currentScenarioIndex < state.scenarios.length - 1) {
-      set((s) => ({
-        currentScenarioIndex: s.currentScenarioIndex + 1,
-        view: 'GAME',
-      }));
-    } else {
-      // Game Over
-      const finalTotal = calculateTotalScore(state.scores);
-      const result: GameResult = {
-        id: `${finalTotal}-${Date.now()}`,
-        playerName: state.playerName,
-        avatar: state.avatar,
-        finalScores: {
-          ...state.scores,
-          total: finalTotal,
-        },
-        timestamp: new Date().toISOString(),
-      };
-      Storage.saveResult(result);
-      set({ view: 'RESULT' });
-    }
-  },
-
-  restartGame: () => {
-    set({ view: 'START' });
-  },
-
-  spendPoliticalCapital: (amount) => {
-    set((state) => ({
-      politicalCapital: Math.max(0, state.politicalCapital - amount),
-    }));
   },
 
   loadResults: () => {
     set({ results: Storage.getResults() });
   },
 
-  resetScenarios: () => {
-    const reset = Storage.resetScenarios();
-    set({ scenarios: reset });
+  startGame: (name, avatar) => {
+    set({
+      playerName: name,
+      avatar,
+      scores: INITIAL_SCORES,
+      currentScenarioIndex: 0,
+      lastDecision: null,
+      stars: 0,
+      lastStarReward: 0,
+      view: 'GAME',
+    });
   },
 
-  saveScenariosToStorage: (scenarios) => {
-    Storage.saveScenarios(scenarios);
-    set({ scenarios }); // Update local state as well
-  },
-
-  addScenario: (scenario) => {
-    set((state) => ({ scenarios: [...state.scenarios, scenario] }));
-  },
-
-  deleteScenario: (id) => {
-    set((state) => ({ scenarios: state.scenarios.filter((s) => s.id !== id) }));
-  },
-
-  clearResults: () => {
-    Storage.clearResults();
-    set({ results: [] });
-  },
-
-  updateScenarioField: (id, field, value) => {
+  makeDecision: (option) => {
+    const earnedStars = calculateStarReward(option.effects);
     set((state) => ({
-      scenarios: state.scenarios.map((s) =>
-        s.id === id ? { ...s, [field]: value } : s
-      ),
+      lastDecision: option,
+      scores: calculateNewScores(state.scores, option.effects),
+      stars: state.stars + earnedStars,
+      lastStarReward: earnedStars,
+      view: 'REACTION',
     }));
   },
 
-  updateOptionField: (scenarioId, optionId, field, value) => {
-    set((state) => ({
-      scenarios: state.scenarios.map((s) => {
-        if (s.id === scenarioId) {
-          return {
-            ...s,
-            options: s.options.map((o) =>
-              o.id === optionId ? { ...o, [field]: value } : o
-            ),
-          };
-        }
-        return s;
-      }),
-    }));
+  continueGame: () => {
+    const state = get();
+
+    if (state.currentScenarioIndex < state.scenarios.length - 1) {
+      set((current) => ({
+        currentScenarioIndex: current.currentScenarioIndex + 1,
+        view: 'GAME',
+      }));
+      return;
+    }
+
+    const finalTotal = calculateTotalScore(state.scores);
+    const title = getResultTitle(finalTotal);
+    const badges = getUnlockedBadges(state.scores, state.stars, finalTotal);
+
+    const result: GameResult = {
+      id: `${finalTotal}-${Date.now()}`,
+      playerName: state.playerName,
+      avatar: state.avatar,
+      title,
+      finalScores: {
+        ...state.scores,
+        total: finalTotal,
+      },
+      starsEarned: state.stars,
+      badges,
+      timestamp: new Date().toISOString(),
+    };
+
+    Storage.saveResult(result);
+    set({ results: Storage.getResults(), view: 'RESULT' });
+  },
+
+  restartGame: () => {
+    set({
+      view: 'START',
+      currentScenarioIndex: 0,
+      lastDecision: null,
+      stars: 0,
+      lastStarReward: 0,
+      scores: INITIAL_SCORES,
+    });
   },
 }));

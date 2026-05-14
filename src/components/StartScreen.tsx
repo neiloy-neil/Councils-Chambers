@@ -1,160 +1,240 @@
 import { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { User, UserCircle, Shield, Settings, ArrowRight } from 'lucide-react';
+import { Shield, Settings, ArrowRight, Sparkles, Stars, Map, Crown, Trophy, Star } from 'lucide-react';
 import { audioManager } from '../utils/audioService';
-import { cardEntrance, buttonHover } from '../animations/variants';
-import { useGameStore } from '../store'; // Import the Zustand store
+import { cardVariants, buttonVariants, staggerContainer } from '../animations/variants';
+import { useGameStore } from '../store';
+import { avatarOptions } from '../constants/theme';
 import '../styles/theme.css';
 
 export default function StartScreen() {
   const startGame = useGameStore((state) => state.startGame);
   const setView = useGameStore((state) => state.setView);
+  const results = useGameStore((state) => state.results);
 
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState<'male' | 'female'>('male');
+  const [avatar, setAvatar] = useState<'male' | 'female'>('female');
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      audioManager.play('paper');
-      startGame(name.trim(), avatar);
-    }
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!name.trim()) return;
+    audioManager.play('paper');
+    startGame(name.trim(), avatar);
   };
 
-  const selectAvatar = (av: 'male' | 'female') => {
-    setAvatar(av);
+  const selectAvatar = (nextAvatar: 'male' | 'female') => {
+    setAvatar(nextAvatar);
     audioManager.play('click');
   };
 
+  const openAdmin = () => {
+    audioManager.play('click');
+    setView('ADMIN');
+  };
+
+  const featureCards = [
+    { icon: Sparkles, title: 'Friendly choices', text: 'Pick ideas that help your city shine.' },
+    { icon: Stars, title: 'Earn reward stars', text: 'Stack stars and unlock cheerful badges.' },
+    { icon: Map, title: 'Grow your town', text: 'Guide Cartoon City through 10 mini adventures.' },
+  ];
+
+  const leaders = [...results]
+    .sort((left, right) => {
+      if (right.finalScores.total !== left.finalScores.total) {
+        return right.finalScores.total - left.finalScores.total;
+      }
+      return right.starsEarned - left.starsEarned;
+    })
+    .slice(0, 3);
+
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen p-6 overflow-hidden relative start-screen-background"
-    >
+    <div className="playful-shell relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8">
+      <div className="playful-cloud playful-cloud-left" />
+      <div className="playful-cloud playful-cloud-right" />
+      <div className="playful-confetti playful-confetti-top" />
+      <div className="playful-confetti playful-confetti-bottom" />
+
       <motion.div
-        variants={cardEntrance}
-        initial="initial"
-        animate="animate"
-        className="max-w-md w-full p-8 rounded-lg shadow-2xl start-screen-card"
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        className="panel-card relative z-10 grid w-full max-w-6xl gap-8 overflow-hidden p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8"
       >
-        <div className="flex justify-between items-start mb-8">
-          <motion.div
-            whileHover={{ rotate: 10, scale: 1.1 }}
-            className="p-4 rounded-2xl shadow-xl shield-icon-background"
-          >
-            <Shield className="w-8 h-8 shield-icon-color" />
-          </motion.div>
-          <motion.button
-            variants={buttonHover}
-            whileHover="hover"
-            whileTap="tap"
-            onClick={() => setView('ADMIN')}
-            className="p-3 rounded-xl admin-button"
-            title="Admin Panel"
-          >
-            <Settings className="w-5 h-5 admin-button-icon" />
-          </motion.button>
-        </div>
+        <div className="space-y-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="icon-bubble bg-[var(--color-sunshine)] text-[var(--color-ink)]">
+                <Shield className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="eyebrow">Playful leadership adventure</p>
+                <h1 className="hero-title">Cartoon City Crew</h1>
+              </div>
+            </div>
 
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <h1 className="text-4xl font-serif font-black mb-4 tracking-tight title-color">
-            Council Chambers
-          </h1>
-          <p className="text-lg font-medium leading-relaxed max-w-sm subtitle-color">
-            Elected by the people. Guided by duty. Your term begins.
-          </p>
-        </motion.div>
-
-        <form onSubmit={handleSubmit} className="space-y-8 mt-8">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-            <label
-              className="block text-xs font-bold uppercase tracking-widest mb-2 label-color"
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={openAdmin}
+              className="secondary-pill"
+              title="Open the editor panel"
             >
-              Designated Identity
-            </label>
-            <div className="relative group">
+              <Settings className="h-4 w-4" />
+              <span>Creator Hub</span>
+            </motion.button>
+          </div>
+
+          <div className="space-y-4">
+            <p className="max-w-xl text-lg leading-8 text-[var(--color-muted)] md:text-xl">
+              Run your own bright little city, solve neighborhood problems, and collect stars for clever, kind choices.
+            </p>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid gap-3 sm:grid-cols-3"
+            >
+              {featureCards.map((item) => (
+                <motion.div key={item.title} variants={cardVariants} className="mini-panel">
+                  <item.icon className="mb-3 h-5 w-5 text-[var(--color-berry)]" />
+                  <p className="mb-1 text-sm font-black text-[var(--color-text)]">{item.title}</p>
+                  <p className="text-sm leading-6 text-[var(--color-muted)]">{item.text}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="eyebrow" htmlFor="player-name">
+                Team leader name
+              </label>
               <input
+                id="player-name"
                 type="text"
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Alex Johnson"
-                className="w-full px-6 py-4 rounded-lg border-2 transition-all text-lg font-bold input-field"
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Type your name"
+                className="playful-input"
               />
             </div>
-          </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
-            <label
-              className="block text-xs font-bold uppercase tracking-widest mb-2 label-color"
-            >
-              Portrait Selection
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              <motion.button
-                type="button"
-                variants={buttonHover}
-                whileHover="hover"
-                whileTap="tap"
-                onClick={() => selectAvatar('male')}
-                className={`group flex flex-col items-center justify-center p-6 rounded-lg border-2 transition-all relative overflow-hidden ${
-                  avatar === 'male' ? 'avatar-button-male' : 'avatar-button-inactive'
-                }`}
-              >
-                <div
-                  className={`p-4 rounded-full mb-3 z-10 transition-all ${
-                    avatar === 'male' ? 'avatar-icon-male-active' : 'avatar-icon-inactive'
-                  }`}
-                >
-                  <User className="w-8 h-8" />
-                </div>
-                <span
-                  className={`text-xs font-bold tracking-widest z-10 uppercase ${
-                    avatar === 'male' ? 'avatar-text-male-active' : 'avatar-text-inactive'
-                  }`}
-                >
-                  Statesman
-                </span>
-              </motion.button>
-
-              <motion.button
-                type="button"
-                variants={buttonHover}
-                whileHover="hover"
-                whileTap="tap"
-                onClick={() => selectAvatar('female')}
-                className={`group flex flex-col items-center justify-center p-6 rounded-lg border-2 transition-all relative overflow-hidden ${
-                  avatar === 'female' ? 'avatar-button-female' : 'avatar-button-inactive'
-                }`}
-              >
-                <div
-                  className={`p-4 rounded-full mb-3 z-10 transition-all ${
-                    avatar === 'female' ? 'avatar-icon-female-active' : 'avatar-icon-inactive'
-                  }`}
-                >
-                  <UserCircle className="w-8 h-8" />
-                </div>
-                <span
-                  className={`text-xs font-bold tracking-widest z-10 uppercase ${
-                    avatar === 'female' ? 'avatar-text-female-active' : 'avatar-text-inactive'
-                  }`}
-                >
-                  Matriarch
-                </span>
-              </motion.button>
+            <div className="space-y-3">
+              <p className="eyebrow">Choose your city hero</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(['female', 'male'] as const).map((option) => {
+                  const selected = avatar === option;
+                  return (
+                    <motion.button
+                      key={option}
+                      type="button"
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                      onClick={() => selectAvatar(option)}
+                      className={`avatar-card ${selected ? 'avatar-card-active' : ''}`}
+                    >
+                      <span className="text-4xl">{avatarOptions[option].emoji}</span>
+                      <span className="mt-3 text-base font-black text-[var(--color-text)]">
+                        {avatarOptions[option].label}
+                      </span>
+                      <span className="mt-1 text-sm text-[var(--color-muted)]">
+                        {option === 'female' ? 'Leads with sparkle and plans.' : 'Leads with energy and daring.'}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
             </div>
-          </motion.div>
 
-          <motion.button
-            type="submit"
-            variants={buttonHover}
-            whileHover="hover"
-            whileTap="tap"
-            className="w-full py-5 rounded-lg font-bold text-sm transition-all shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest submit-button"
-          >
-            <span>Accept Appointment</span>
-            <ArrowRight className="w-4 h-4" />
-          </motion.button>
-        </form>
+            <motion.button
+              type="submit"
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="primary-cta w-full justify-center"
+            >
+              <span>Start city adventure</span>
+              <ArrowRight className="h-5 w-5" />
+            </motion.button>
+          </form>
+        </div>
+
+        <div className="hero-side-panel flex flex-col justify-between gap-6">
+          <div>
+            <div className="city-postcard mb-6">
+              <span className="city-postcard-badge">10 story stops</span>
+              <div className="city-postcard-sun" />
+              <div className="city-postcard-buildings">
+                <span className="city-building city-building-tall" />
+                <span className="city-building city-building-mid" />
+                <span className="city-building city-building-small" />
+                <span className="city-building city-building-mid-alt" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="mini-panel">
+                <p className="eyebrow">Secret star rewards</p>
+                <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  Each decision can unlock surprise stars, but you only learn the bonus after the crowd reacts.
+                </p>
+              </div>
+
+              <div className="mini-panel">
+                <p className="eyebrow">Badge examples</p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <span className="badge-chip">Heart of Town</span>
+                  <span className="badge-chip">Fair Play Champ</span>
+                  <span className="badge-chip">Star Collector</span>
+                </div>
+              </div>
+
+              <div className="mini-panel">
+                <div className="mb-3 flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-[var(--color-berry)]" />
+                  <p className="eyebrow">Leadership board</p>
+                </div>
+
+                {leaders.length > 0 ? (
+                  <div className="space-y-3">
+                    {leaders.map((result, index) => (
+                      <div key={result.id} className="leader-row">
+                        <div className="flex items-center gap-3">
+                          <span className="leader-rank">#{index + 1}</span>
+                          <div>
+                            <p className="text-sm font-black text-[var(--color-text)]">{result.playerName}</p>
+                            <p className="text-xs font-bold text-[var(--color-muted)]">{result.title}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center justify-end gap-1 text-sm font-black text-[var(--color-text)]">
+                            <Trophy className="h-3.5 w-3.5 text-[var(--color-lavender)]" />
+                            {result.finalScores.total}
+                          </div>
+                          <div className="flex items-center justify-end gap-1 text-xs font-bold text-[var(--color-muted)]">
+                            <Star className="h-3 w-3 text-[var(--color-sunshine)]" />
+                            {result.starsEarned} stars
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm leading-6 text-[var(--color-muted)]">
+                    Finish a run to place your name on the leadership board.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[28px] bg-white/70 p-4 text-sm leading-6 text-[var(--color-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+            “Cartoon City needs a mayor who can listen, imagine, and help everyone play on the same team.”
+          </div>
+        </div>
       </motion.div>
     </div>
   );

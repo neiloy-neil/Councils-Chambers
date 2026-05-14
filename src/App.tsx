@@ -6,128 +6,49 @@ import ReactionScreen from './components/ReactionScreen';
 import ResultScreen from './components/ResultScreen';
 import AdminPanel from './components/AdminPanel';
 import './styles/theme.css';
-import { pageTransition } from './animations/variants';
-import { useGameStore } from './store'; // Import the Zustand store
+import { pageVariants } from './animations/variants';
+import { useGameStore } from './store';
 
 export default function App() {
-  const {
-    view,
-    playerName,
-    avatar,
-    scenarios,
-    currentScenarioIndex,
-    scores,
-    lastDecision,
-    setView,
-    loadScenarios,
-    startGame,
-    makeDecision,
-    continueGame,
-    restartGame,
-  } = useGameStore();
+  const view = useGameStore((state) => state.view);
+  const setView = useGameStore((state) => state.setView);
+  const loadScenarios = useGameStore((state) => state.loadScenarios);
+  const loadResults = useGameStore((state) => state.loadResults);
 
   useEffect(() => {
     loadScenarios();
-  }, [view, loadScenarios]);
-
-  const handleStartGame = (name: string, av: 'male' | 'female') => {
-    startGame(name, av);
-  };
-
-  const handleDecision = (option: DecisionOption) => {
-    makeDecision(option);
-  };
-
-  const handleContinue = () => {
-    continueGame();
-  };
-
-  const handleRestart = () => {
-    restartGame();
-  };
+    loadResults();
+  }, [loadResults, loadScenarios]);
 
   return (
-    <div className="app-background min-h-screen relative overflow-hidden">
+    <div className="min-h-screen overflow-hidden">
       <AnimatePresence mode="wait">
         {view === 'START' && (
-          <motion.div
-            key="start"
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            layout
-          >
-            <StartScreen
-              onStart={handleStartGame}
-              onAdmin={() => setView('ADMIN')}
-            />
+          <motion.div key="start" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
+            <StartScreen />
           </motion.div>
         )}
 
-        {view === 'GAME' && scenarios.length > 0 && (
-          <motion.div
-            key={`game-${currentScenarioIndex}`}
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            layout
-          >
-            <GameScreen
-              scenario={scenarios[currentScenarioIndex]}
-              meetingNumber={currentScenarioIndex + 1}
-              totalMeetings={scenarios.length}
-              onDecision={handleDecision}
-              onHome={handleRestart}
-            />
+        {view === 'GAME' && (
+          <motion.div key="game" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
+            <GameScreen />
           </motion.div>
         )}
 
-        {view === 'REACTION' && lastDecision && (
-          <motion.div
-            key="reaction"
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            layout
-          >
-            <ReactionScreen
-              option={lastDecision}
-              onContinue={handleContinue}
-              onHome={handleRestart}
-            />
+        {view === 'REACTION' && (
+          <motion.div key="reaction" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
+            <ReactionScreen />
           </motion.div>
         )}
 
         {view === 'RESULT' && (
-          <motion.div
-            key="result"
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            layout
-          >
-            <ResultScreen
-              playerName={playerName}
-              avatar={avatar}
-              scores={scores}
-              onRestart={restartGame}
-            />
+          <motion.div key="result" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
+            <ResultScreen />
           </motion.div>
         )}
 
         {view === 'ADMIN' && (
-          <motion.div
-            key="admin"
-            variants={pageTransition}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            layout
-          >
+          <motion.div key="admin" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
             <AdminPanel onBack={() => setView('START')} />
           </motion.div>
         )}

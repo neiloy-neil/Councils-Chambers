@@ -1,37 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", serif;
-  --font-mono: "JetBrains Mono", monospace;
-  
-  --color-parliament: #121d2f;
-  --color-gold: #d4af37;
-  --color-parchment: #fdfaf3;
-  --color-slate-900: #1a1a1a;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fredoka", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
   body {
-    @apply text-slate-900 antialiased selection:bg-gold/30;
+    margin: 0;
+    min-width: 320px;
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  @keyframes shimmer {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(100%); }
+  button,
+  input,
+  textarea {
+    font: inherit;
   }
 
-  .text-gold-gradient {
-    background: linear-gradient(to right, #d4af37, #f1d592, #d4af37);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% auto;
-    animation: textShimmer 4s linear infinite;
-  }
-
-  @keyframes textShimmer {
-    to { background-position: 200% center; }
+  h1,
+  h2,
+  h3,
+  .hero-title {
+    font-family: var(--font-display);
   }
 }

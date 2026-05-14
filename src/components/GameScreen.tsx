@@ -1,160 +1,144 @@
 import { motion } from 'framer-motion';
-import { Building2, Landmark, HelpCircle, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, Star, TimerReset, Trophy } from 'lucide-react';
 import { audioManager } from '../utils/audioService';
-import { cardEntrance, buttonHover } from '../animations/variants';
-import { useGameStore } from '../store'; // Import the Zustand store
-import '../styles/theme.css'; // Import the theme.css
+import { buttonVariants, cardVariants, staggerContainer } from '../animations/variants';
+import { useGameStore } from '../store';
+import '../styles/theme.css';
 
 export default function GameScreen() {
   const scenario = useGameStore((state) => state.scenarios[state.currentScenarioIndex]);
   const meetingNumber = useGameStore((state) => state.currentScenarioIndex + 1);
   const totalMeetings = useGameStore((state) => state.scenarios.length);
+  const stars = useGameStore((state) => state.stars);
   const makeDecision = useGameStore((state) => state.makeDecision);
   const restartGame = useGameStore((state) => state.restartGame);
 
-  const handleDecision = (option: DecisionOption) => {
+  if (!scenario) {
+    return null;
+  }
+
+  const handleDecision = (optionId: string) => {
+    const option = scenario.options.find((item) => item.id === optionId);
+    if (!option) return;
+    audioManager.play('suspense');
     audioManager.play('gavel');
     makeDecision(option);
   };
 
   const handleHome = () => {
-    if (confirm("Abandon legislative session and return to headquarters? Progress will be lost.")) {
-      audioManager.play('click');
-      restartGame();
-    }
+    if (!confirm('Leave Cartoon City and lose this run?')) return;
+    audioManager.play('click');
+    restartGame();
   };
 
-  if (!scenario) {
-    return null; // Or a loading spinner, or redirect to start
-  }
-
   return (
-    <div
-      className="flex flex-col items-center min-h-screen p-4 font-sans relative overflow-hidden game-screen-background"
-    >
-      <div className="absolute top-4 left-4 z-50">
-        <motion.button
-          variants={buttonHover}
-          whileHover="hover"
-          whileTap="tap"
-          onClick={handleHome}
-          className="group flex items-center gap-2 px-4 py-2 rounded-full return-button"
-        >
-          <ArrowRight className="w-3.5 h-3.5 rotate-180" />
-          <span className="text-xs font-bold uppercase tracking-widest">Return</span>
-        </motion.button>
-      </div>
+    <div className="playful-shell min-h-screen px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <motion.button variants={buttonVariants} whileHover="hover" whileTap="tap" onClick={handleHome} className="secondary-pill">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Leave run</span>
+            </motion.button>
+            <div className="mini-panel flex items-center gap-2 px-4 py-3">
+              <TimerReset className="h-4 w-4 text-[var(--color-lavender)]" />
+              <span className="text-sm font-black text-[var(--color-text)]">Stop {meetingNumber} of {totalMeetings}</span>
+            </div>
+          </div>
 
-      <div className="max-w-4xl w-full py-8 relative z-10">
-        <header
-          className="mb-8 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 p-6 rounded-lg game-header"
-        >
-          <div className="flex items-center gap-6">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              className="p-4 rounded-2xl shadow-xl transition-colors landmark-icon-background"
-            >
-              <Landmark className="w-8 h-8" />
-            </motion.div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="mini-panel flex items-center gap-2 px-4 py-3">
+              <Star className="h-4 w-4 text-[var(--color-sunshine)]" />
+              <span className="text-sm font-black text-[var(--color-text)]">{stars} reward stars</span>
+            </div>
+            <div className="mini-panel flex items-center gap-2 px-4 py-3">
+              <Trophy className="h-4 w-4 text-[var(--color-berry)]" />
+              <span className="text-sm font-black text-[var(--color-text)]">Collect badges at the finish</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="progress-panel">
+          <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <p
-                className="text-xs uppercase tracking-widest font-bold mb-1 session-label"
-              >
-                Legislative Session
-              </p>
-              <h2 className="text-3xl font-serif font-black meeting-title">
-                Meeting {meetingNumber} <span className="font-light text-xl ml-1 meeting-subtitle">/ {totalMeetings}</span>
-              </h2>
+              <p className="eyebrow">City adventure trail</p>
+              <h2 className="text-2xl font-black text-[var(--color-text)]">Guide the next neighborhood challenge</h2>
             </div>
+            <Sparkles className="hidden h-6 w-6 text-[var(--color-coral)] md:block" />
           </div>
 
-          <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
-            <p
-              className="text-xs uppercase tracking-widest font-bold session-label"
-            >
-              Progression
-            </p>
-            <div className="flex gap-2 p-1.5 rounded-full progression-bar-container">
-              {Array.from({ length: totalMeetings }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={false}
-                  animate={{
-                    backgroundColor: i < meetingNumber ? 'var(--color-primary)' : 'var(--color-secondary-20)',
-                    width: i === meetingNumber - 1 ? 48 : 10,
-                  }}
-                  transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                  className="h-3 rounded-full relative"
-                />
-              ))}
-            </div>
+          <div className="grid gap-3 sm:grid-cols-5 lg:grid-cols-10">
+            {Array.from({ length: totalMeetings }).map((_, index) => {
+              const active = index === meetingNumber - 1;
+              const done = index < meetingNumber - 1;
+              return (
+                <div key={index} className={`trail-stop ${active ? 'trail-stop-active' : done ? 'trail-stop-done' : ''}`}>
+                  <span className="text-xs font-black">{index + 1}</span>
+                </div>
+              );
+            })}
           </div>
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 items-start">
-          <motion.div
-            key={scenario.id}
-            variants={cardEntrance}
-            initial="initial"
-            animate="animate"
-            className="rounded-lg shadow-2xl overflow-hidden relative game-card"
-          >
-            <div
-              className="relative h-60 flex items-center justify-center overflow-hidden game-card-header"
-            >
-              <div className="relative z-10 px-12 py-8 w-full text-center md:text-left">
-                <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-                  <span
-                    className="inline-block px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-bold mb-4 priority-agenda-label"
-                  >
-                    Priority Agenda
-                  </span>
-                  <h3 className="text-3xl md:text-4xl font-serif font-black leading-tight max-w-2xl scenario-title">
-                    {scenario.title}
-                  </h3>
-                </motion.div>
+        <motion.div variants={cardVariants} initial="hidden" animate="visible" className="panel-card p-6 md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="space-y-6">
+              <div>
+                <p className="eyebrow">Story stop {meetingNumber}</p>
+                <h3 className="hero-title !text-4xl">{scenario.title}</h3>
               </div>
-            </div>
 
-            <div className="p-10 relative z-10">
+              <div className="story-bubble">
+                <p className="text-lg leading-8 text-[var(--color-text)]">{scenario.description}</p>
+              </div>
+
               <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="border-l-4 rounded-lg p-8 mb-10 scenario-description-container"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                className="grid gap-4"
               >
-                <p className="text-xl font-serif leading-relaxed scenario-description">
-                  "{scenario.description}"
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {scenario.options.map((option, index) => (
+                {scenario.options.map((option) => (
                   <motion.button
                     key={option.id}
-                    variants={buttonHover}
+                    variants={cardVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    onClick={() => handleDecision(option)}
-                    className="group relative flex flex-col items-start gap-4 p-8 rounded-lg border-2 text-left decision-button"
+                    onClick={() => handleDecision(option.id)}
+                    className="choice-card text-left"
                   >
-                    <div
-                      className="p-3 rounded-2xl shadow-sm transition-all decision-button-icon-container"
-                    >
-                      <HelpCircle className="w-6 h-6" />
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <span className="choice-badge">Choice</span>
+                      <span className="mystery-pill">Mystery reward</span>
                     </div>
-                    <span className="font-serif font-black text-xl leading-tight decision-button-text">
-                      {option.text}
-                    </span>
-                    <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                      <ArrowRight className="w-8 h-8 decision-button-arrow" />
+
+                    <p className="mb-4 text-xl font-black leading-8 text-[var(--color-text)]">{option.text}</p>
+                    <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-muted)]">
+                      <span>Make your pick</span>
+                      <ArrowRight className="h-4 w-4" />
                     </div>
                   </motion.button>
                 ))}
+              </motion.div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="mini-panel">
+                <p className="eyebrow mb-2">Mystery stars</p>
+                <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  Rewards stay hidden until after you choose, so trust your instincts and see what happens.
+                </p>
+              </div>
+
+              <div className="mini-panel">
+                <p className="eyebrow mb-2">Final report</p>
+                <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  The full city mood meters will appear on the end results screen after your last story stop.
+                </p>
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
